@@ -3248,3 +3248,25 @@ class XayaRegtest(XayaTestnet):
     GENESIS_HASH = ('6f750b36d22f1dc3d0a6e483af453010'
                     '22646dfc3b3ba2187865f5a7d6d83ab1')
     RPC_PORT = 18493
+
+
+class BlackSageCoin(KomodoMixin, EquihashMixin, Coin):
+    NAME = "BlackSage"
+    SHORTNAME = "BSG"
+    NET = "mainnet"
+    TX_COUNT = 173
+    TX_COUNT_HEIGHT = 131
+    TX_PER_BLOCK = 1
+    RPC_PORT = 8465
+    PEERS = []
+
+
+class WhiteSageCoin(KomodoMixin, EquihashMixin, Coin):
+    NAME = "WhiteSage"
+    SHORTNAME = "WSG"
+    NET = "mainnet"
+    TX_COUNT = 130
+    TX_COUNT_HEIGHT = 171
+    TX_PER_BLOCK = 1
+    RPC_PORT = 11511
+    PEERS = []

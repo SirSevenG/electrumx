@@ -3265,8 +3265,8 @@ class WhiteSageCoin(KomodoMixin, EquihashMixin, Coin):
     NAME = "WhiteSage"
     SHORTNAME = "WSG"
     NET = "mainnet"
-    TX_COUNT = 130
-    TX_COUNT_HEIGHT = 171
+    TX_COUNT = 171
+    TX_COUNT_HEIGHT = 130
     TX_PER_BLOCK = 1
     RPC_PORT = 11511
     PEERS = []

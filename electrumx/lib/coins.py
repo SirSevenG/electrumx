@@ -3253,7 +3253,6 @@ class XayaRegtest(XayaTestnet):
 class BlackSageCoin(KomodoMixin, EquihashMixin, Coin):
     NAME = "BlackSage"
     SHORTNAME = "BSG"
-    NET = "mainnet"
     TX_COUNT = 173
     TX_COUNT_HEIGHT = 131
     TX_PER_BLOCK = 1
@@ -3264,7 +3263,6 @@ class BlackSageCoin(KomodoMixin, EquihashMixin, Coin):
 class WhiteSageCoin(KomodoMixin, EquihashMixin, Coin):
     NAME = "WhiteSage"
     SHORTNAME = "WSG"
-    NET = "mainnet"
     TX_COUNT = 171
     TX_COUNT_HEIGHT = 130
     TX_PER_BLOCK = 1

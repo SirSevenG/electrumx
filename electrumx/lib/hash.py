@@ -31,6 +31,8 @@ import hmac
 
 from electrumx.lib.util import bytes_to_int, int_to_bytes, hex_to_bytes
 
+
+
 _sha256 = hashlib.sha256
 _sha512 = hashlib.sha512
 _new_hash = hashlib.new

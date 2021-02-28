@@ -37,12 +37,13 @@ if TYPE_CHECKING:
 
 @dataclass(order=True)
 class UTXO:
-    __slots__ = 'tx_num', 'tx_pos', 'tx_hash', 'height', 'value'
+    __slots__ = 'tx_num', 'tx_pos', 'tx_hash', 'height', 'value', 'locktime'
     tx_num: int      # index of tx in chain order
     tx_pos: int      # tx output idx
     tx_hash: bytes   # txid
     height: int      # block height
     value: int       # in satoshis
+    locktime: int    # timestamp from 'parent' Tx
 
 
 @attr.s(slots=True)
@@ -53,7 +54,8 @@ class FlushData:
     block_tx_hashes = attr.ib()
     # The following are flushed to the UTXO DB if undo_infos is not None
     undo_infos = attr.ib()  # type: List[Tuple[Sequence[bytes], int]]
-    adds = attr.ib()  # type: Dict[bytes, bytes]  # txid+out_idx -> hashX+tx_num+value_sats
+    # Updated to add utxo (parent tx) locktime
+    adds = attr.ib()  # type: Dict[bytes, bytes]  # txid+out_idx -> hashX+tx_num+value_sats+locktime
     deletes = attr.ib()  # type: List[bytes]  # b'h' db keys, and b'u' db keys
     tip = attr.ib()
 
@@ -334,10 +336,11 @@ class DB:
             hashX = value[:HASHX_LEN]
             txout_idx = key[-4:]
             tx_num = value[HASHX_LEN: HASHX_LEN+TXNUM_LEN]
-            value_sats = value[-8:]
+            value_sats = value[-12:-4]
+            tx_locktime = value[-4:]
             suffix = txout_idx + tx_num
             batch_put(b'h' + key[:COMP_TXID_LEN] + suffix, hashX)
-            batch_put(b'u' + hashX + suffix, value_sats)
+            batch_put(b'u' + hashX + suffix, value_sats + tx_locktime)
         flush_data.adds.clear()
 
         # New undo information
@@ -747,6 +750,9 @@ class DB:
         with self.utxo_db.write_batch() as batch:
             self.write_utxo_state(batch)
 
+    # TODO: CALC AND ADD PROPER HANDLER FOR LOCKTIME
+    # Plan: db_value = tx_out_value 8b ULongLong + tx_locktime 4b UInt
+    # Need to properly slice bytes here
     async def all_utxos(self, hashX):
         '''Return all UTXOs for an address sorted in no particular order.'''
         def read_utxos():
@@ -759,9 +765,10 @@ class DB:
             for db_key, db_value in self.utxo_db.iterator(prefix=prefix):
                 txout_idx, = unpack_le_uint32(db_key[-TXNUM_LEN-4:-TXNUM_LEN])
                 tx_num, = unpack_le_uint64(db_key[-TXNUM_LEN:] + txnum_padding)
-                value, = unpack_le_uint64(db_value)
+                value, = unpack_le_uint64(db_value[:8])
+                locktime, = unpack_le_uint32(db_value[8:12])
                 tx_hash, height = self.fs_tx_hash(tx_num)
-                utxos_append(UTXO(tx_num, txout_idx, tx_hash, height, value))
+                utxos_append(UTXO(tx_num, txout_idx, tx_hash, height, value, locktime))
             return utxos
 
         while True:

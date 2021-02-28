@@ -1101,6 +1101,7 @@ class ElectrumX(SessionBase):
             self.unsubscribe_hashX(hashX)
             return None
 
+    # TODO: Added locktime -> need to fix tests later
     async def hashX_listunspent(self, hashX):
         '''Return the list of UTXOs of a script hash, including mempool
         effects.'''
@@ -1112,7 +1113,9 @@ class ElectrumX(SessionBase):
 
         return [{'tx_hash': hash_to_hex_str(utxo.tx_hash),
                  'tx_pos': utxo.tx_pos,
-                 'height': utxo.height, 'value': utxo.value}
+                 'height': utxo.height,
+                 'value': utxo.value,
+                 'locktime': utxo.locktime}
                 for utxo in utxos
                 if (utxo.tx_hash, utxo.tx_pos) not in spends]
 

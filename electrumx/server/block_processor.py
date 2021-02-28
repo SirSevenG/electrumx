@@ -373,6 +373,7 @@ class BlockProcessor:
         # Good average estimates based on traversal of subobjects and
         # requesting size from Python (see deep_getsizeof).
         one_MB = 1000*1000
+        # TODO: recheck cache size - might fail here
         utxo_cache_size = len(self.utxo_cache) * 205
         db_deletes_size = len(self.db_deletes) * 57
         hist_cache_size = self.db.history.unflushed_memsize()
@@ -451,6 +452,7 @@ class BlockProcessor:
                 undo_info_append(cache_value)
                 append_hashX(cache_value[:HASHX_LEN])
 
+            # TODO: HERE -- add Tx.locktime to each corresponding UTXO
             # Add the new UTXOs
             for idx, txout in enumerate(tx.outputs):
                 # Ignore unspendable outputs
@@ -461,7 +463,7 @@ class BlockProcessor:
                 hashX = script_hashX(txout.pk_script)
                 append_hashX(hashX)
                 put_utxo(tx_hash + to_le_uint32(idx),
-                         hashX + tx_numb + to_le_uint64(txout.value))
+                         hashX + tx_numb + to_le_uint64(txout.value) + to_le_uint32(tx.locktime))
 
             append_hashXs(hashXs)
             update_touched(hashXs)
@@ -586,7 +588,7 @@ class BlockProcessor:
           to.
 
     To this end we maintain two "tables", one for each point above:
-
+      TODO: Add locktime here
       1.  Key: b'u' + address_hashX + tx_idx + tx_num
           Value: the UTXO value as a 64-bit unsigned integer
 

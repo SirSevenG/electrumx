@@ -815,6 +815,7 @@ class DB:
                     # that new block
                     return None
                 # Key: b'u' + address_hashX + tx_idx + tx_num
+                # TODO: Update comments here
                 # Value: the UTXO value as a 64-bit unsigned integer
                 key = b'u' + hashX + suffix
                 db_value = self.utxo_db.get(key)
@@ -822,7 +823,7 @@ class DB:
                     # This can happen if the DB was updated between
                     # getting the hashXs and getting the UTXOs
                     return None
-                value, = unpack_le_uint64(db_value)
+                value, = unpack_le_uint64(db_value[:8])
                 return hashX, value
             return [lookup_utxo(*hashX_pair) for hashX_pair in hashX_pairs]
 

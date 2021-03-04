@@ -522,7 +522,7 @@ class BlockProcessor:
         put_utxo = self.utxo_cache.__setitem__
         spend_utxo = self.spend_utxo
         touched = self.touched
-        undo_entry_len = HASHX_LEN + TXNUM_LEN + 8
+        undo_entry_len = HASHX_LEN + TXNUM_LEN + 12  # 8
 
         for tx, tx_hash in reversed(txs):
             for idx, txout in enumerate(tx.outputs):

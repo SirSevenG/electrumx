@@ -381,7 +381,6 @@ class LegacyRPCDaemon(Daemon):
         transactions = []
         if b.get('height') > 0:
             transactions = await self.getrawtransactions(b.get('tx'), False)
-            self.logger.info(f'\n\ntransaction {transactions}\n\n')
 
         raw_block = header
         num_txs = len(transactions)

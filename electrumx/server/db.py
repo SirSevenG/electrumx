@@ -750,9 +750,6 @@ class DB:
         with self.utxo_db.write_batch() as batch:
             self.write_utxo_state(batch)
 
-    # TODO: CALC AND ADD PROPER HANDLER FOR LOCKTIME
-    # Plan: db_value = tx_out_value 8b ULongLong + tx_locktime 4b UInt
-    # Need to properly slice bytes here
     async def all_utxos(self, hashX):
         '''Return all UTXOs for an address sorted in no particular order.'''
         def read_utxos():
@@ -815,8 +812,7 @@ class DB:
                     # that new block
                     return None
                 # Key: b'u' + address_hashX + tx_idx + tx_num
-                # TODO: Update comments here
-                # Value: the UTXO value as a 64-bit unsigned integer
+                # Value: the UTXO value as a 64-bit unsigned integer + 32-bit unsinged int locktime
                 key = b'u' + hashX + suffix
                 db_value = self.utxo_db.get(key)
                 if not db_value:

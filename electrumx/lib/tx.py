@@ -973,7 +973,11 @@ class DeserializerSmartCash(Deserializer):
 
     @staticmethod
     def keccak(data):
-        from Cryptodome.Hash import keccak
+        # could not found Cryptodome module for fresh python versions -> using pycryptodome instead
+        try:
+            from Cryptodome.Hash import keccak
+        except ModuleNotFoundError:
+            from Crypto.Hash import keccak
         keccak_hash = keccak.new(data=data, digest_bits=256)
         return keccak_hash.digest()
 

@@ -34,6 +34,7 @@ class MemPoolTx:
     out_pairs = attr.ib()
     fee = attr.ib()
     size = attr.ib()
+    locktime = attr.ib()
 
 
 @attr.s(slots=True)
@@ -335,7 +336,7 @@ class MemPool:
                 txout_pairs = tuple((to_hashX(txout.pk_script), txout.value)
                                     for txout in tx.outputs)
                 txs[hash] = MemPoolTx(txin_pairs, None, txout_pairs,
-                                      0, tx_size)
+                                      0, tx_size, tx.locktime)
             return txs
 
         # Thread this potentially slow operation so as not to block
@@ -416,5 +417,5 @@ class MemPool:
             tx = self.txs.get(tx_hash)
             for pos, (hX, value) in enumerate(tx.out_pairs):
                 if hX == hashX:
-                    utxos.append(UTXO(-1, pos, tx_hash, 0, value))
+                    utxos.append(UTXO(-1, pos, tx_hash, 0, value, tx.locktime))
         return utxos
